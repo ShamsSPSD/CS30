@@ -1,0 +1,66 @@
+// Scenery interactive
+//The legend
+//march 5 2024
+//Making an interactive scene
+
+let circleX = 0
+let circleY = 70
+let CurrentBack = 0
+
+function setup() {
+  createCanvas(400, 400);
+
+}
+
+function draw() {
+  if(CurrentBack === 0){
+    background(46,179,255)
+  }else if (CurrentBack === 1){
+   background(37,158,228)
+  }else if (CurrentBack === 2){
+    background(28,137,228)
+  }else{
+    background (19,116,228)
+  }
+
+
+  
+  fill(206,190,55)
+  ellipse(circleX,circleY, 100,100)//when the left/right arrow is pressed it                                    // moves in that direction
+    if (keyIsPressed && keyCode === LEFT_ARROW) {
+    circleX -= 2 ;    
+  } 
+  if (keyIsPressed && keyCode === RIGHT_ARROW) {
+    circleX += 2 ;
+  }
+  if (circleX < -50){// when the sun is off the screen it comes back on the                        //opposite side
+    circleX = 460;
+  } 
+  else if (circleX > 470){
+    circleX = -40;
+  }
+
+  noStroke() //this is the rest of the scene other than the sun
+  fill(195, 132, 42)
+  square(90,200,40)
+  fill(200,200,200)
+  ellipse(100,350, 350,230)
+  fill( 146, 142, 133)
+  ellipse(300,350, 370,270)
+  fill(218, 160, 109)
+  triangle(80,200,140,200,110,160)
+  
+    fill(200,0,200)//My name
+  text('Omar Shams', 2,400)
+}
+
+function mouseClicked(){ //when the mouse is clicked the background changes color
+  if (mouseButton === LEFT){
+    if(CurrentBack === 3){
+       CurrentBack = 0
+      } else {
+       CurrentBack += 1
+      }
+    }
+}
+
