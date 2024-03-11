@@ -1,23 +1,25 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
-let circletime = 100
+
+let circleSize;
+let circleTime = 10;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(400, 400);
 }
-
-function circlechanger(){
-  circletime = noise(circletime * 100)
-}
-
 
 function draw() {
   background(220);
-  strokeWeight(10)
-  circle(width/2,height/2,circletime)
-  circlechanger()
+  diameter();
 }
+
+function diameter(){
+  circleTime += 0.01;
+  circleSize = noise(circleTime);
+  circleSize = map(circleSize,0,1,10,300);
+  fill(220);
+  strokeWeight(5);
+  circle(200,200,circleSize);
+  circleTime;
+
+}
+
+
