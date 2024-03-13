@@ -5,6 +5,7 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let colortime = 10;
 let windowWidth = 700;
 let squareSize;
 let y = 0
@@ -44,12 +45,15 @@ function squarmaker(){
       for(let y = 0; y < height; y += squareSize){
         squareColor = color(Redv,Greenv,Bluev);
         fill(squareColor)
-        noStroke()
+
         square(x,y,squareSize)
 
-        Greenv = noise(255)
-        Bluev = noise(255)
-        Redv = noise(255)
+        Greenv = noise(colortime);
+        Greenv = map(Greenv,0,1,10,255);
+        Bluev = noise(colortime);
+        Bluev = map(Bluev,0,1,50,200);
+        Redv = noise(colortime);
+        Redv = map(Redv,0,1,255,10);
       }
   
     }
