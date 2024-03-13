@@ -27,6 +27,7 @@ function keyPressed(){
 }
 
 
+
 function mousePressed(){
   if ( mouseIsPressed && mouseButton === LEFT){
     if(squareSize < 400) {squareSize = squareSize * 2;}
@@ -46,9 +47,9 @@ function squarmaker(){
         noStroke()
         square(x,y,squareSize)
 
-        Greenv = random(0,255)
-        Bluev = random(0,255)
-        Redv = random(0,255)
+        Greenv = noise(255)
+        Bluev = noise(255)
+        Redv = noise(255)
       }
   
     }
