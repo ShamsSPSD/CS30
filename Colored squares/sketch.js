@@ -5,34 +5,47 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
+let windowWidth = 700;
+let squareSize;
 let y = 0
-let squaresize = 50
-
 let Greenv;
 let Redv; 
 let Bluev;
 let squareColor;
 
+
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(windowWidth, windowWidth);
   squarmaker();
+  document.addEventListener("contextmenu", event => event.preventDefault())
 }
+
+squareSize = (windowWidth/2)
 
 function keyPressed(){
   squarmaker();
 }
 
+
 function mousePressed(){
-  if 
+  if ( mouseIsPressed && mouseButton === LEFT){
+    if(squareSize < 400) {squareSize = squareSize * 2;}
+  }
+
+  if ( mouseIsPressed && mouseButton === RIGHT){
+    if(squareSize > 10) {squareSize = squareSize / 2;}
+  }
+  squarmaker()
 }
 
 function squarmaker(){
-    for(let x = 0; x < width; x += squaresize){
-      for(let y = 0; y < height; y += squaresize){
+    for(let x = 0; x < width; x += squareSize){
+      for(let y = 0; y < height; y += squareSize){
         squareColor = color(Redv,Greenv,Bluev);
         fill(squareColor)
-        square(x,y,squaresize)
-      
+        noStroke()
+        square(x,y,squareSize)
+
         Greenv = random(0,255)
         Bluev = random(0,255)
         Redv = random(0,255)
@@ -41,7 +54,5 @@ function squarmaker(){
     }
   } 
   
-
 function draw() {
-
 }
