@@ -15,18 +15,19 @@ function setup() {
   background(255);
   rectMode(CORNER); 
   drawRectangles();
+  
 }
 
 function drawRectangles(){
   let rectHeight;
   fill(0);
   for(let x = 0; x < width; x += rectWidth){
-    rectHeight = random(0, height*-0.8);
-
+    rectHeight = noise(height);
+    rectHeight = map(rectHeight,0,1,height*-0.8,1)
     rect(x, height, rectWidth, rectHeight);
-
   }
 }
 
 function draw() {
+
 }
