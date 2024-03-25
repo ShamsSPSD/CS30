@@ -21,11 +21,13 @@ function setup() {
 function drawRectangles(){
   let rectHeight;
   fill(0);
+  push();
   for(let x = 0; x < width; x += rectWidth){
     rectHeight = noise(height);
     rectHeight = map(rectHeight,0,1,height*-0.8,1)
     rect(x, height, rectWidth, rectHeight);
   }
+  pop();
 }
 
 function draw() {
