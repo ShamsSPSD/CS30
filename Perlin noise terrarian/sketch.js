@@ -1,35 +1,34 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
 // Terrain Generation Starter
 // Mr. Scott
 // March 11, 2024
 // Procedurally Generated 2D Terrain
 
-let rectWidth = 1;
+let rectWidth = 5;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   background(255);
-  rectMode(CORNER); 
+  //rectMode(CENTER);  //CHANGE THIS!!!!
   drawRectangles();
-  
 }
 
 function drawRectangles(){
+  //using a single loop, generate a bunch of side-to-side
+  //rectangles of varying height (pattern, random, noise)
   let rectHeight;
   fill(0);
-  push();
   for(let x = 0; x < width; x += rectWidth){
-    rectHeight = noise(height);
-    rectHeight = map(rectHeight,0,1,height*-0.8,1)
-    rect(x, height, rectWidth, rectHeight);
+    //option 1 - pattern
+    // rectHeight = x;
+
+    //option 2 - random()
+    rectHeight = noise(0,height* 0.8);
+
+    //perlin noise.. on your own.
+    rect(x, height, rectWidth, -rectHeight);
+
   }
-  pop();
 }
 
 function draw() {
-
 }
