@@ -7,16 +7,17 @@ const NUM_WALKERS = 3;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   walkers.push(new Walker(height/2, 10));
-  walkers.push(new Walker(height/2 + 10, 10));
-  walkers.push(new Walker(height/2 - 10, 10));
+  walkers.push(new Walker(height/2 + 60, 10));
+  walkers.push(new Walker(height/2 - 60, 10));
 }
 
 function draw() {
+  background(220);
   for (let w of walkers ){
     w.move();
     w.display();
   } 
-  background(220);
+  
 }
 
 class Walker {
@@ -30,7 +31,7 @@ class Walker {
   display(){
     rectMode(CENTER);
     fill(this.c);
-    square(this.x, this.y, this.size);
+    circle(this.x, this.y, this.size);
   }
 
   move(){
