@@ -1,28 +1,28 @@
-// Project Title
-// Your Name
-// Date
+// “Ninety Parallel Sinusoids With Linearly Increasing Period”
+// Omar Shams
+// April 16 2024
 //
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// “Ninety Parallel Sinusoids With Linearly Increasing Period”
 
-
-var offset = 0;
-var strum = 1;
-
-function setup() { 
-  createCanvas(windowWidth, windowHeight); 
-  stroke(50);
-  beginShape();
-  vertex(0, 50);
-  for(let x = 0; x < width; x++){
-    let angle = offset + x * 0.01;
-    let y = map(sin(angle), -strum, strum, 100, 360);
-    vertex(x, y);
+function setup() {
+  createCanvas(500  , 500);
+  background(220);
+  
+  for (let i = 0; i < 200; i += 5){    
+    push();
+    translate(75,height/3 + i);
+    theWave();
+    pop();
   }
-  vertex(width, height);
-  endShape();
-  offset += 1;
-} 
+}
 
-function draw() { 
+function theWave(){
+  let x = 0;
+  noFill();
+  beginShape();
+  for(let f = 0; f < width; f +=3){
+    y = sin( 0.0002*(x += 2)**2) * 30;
+    vertex(x,y);
+  }
+  endShape();
 }
