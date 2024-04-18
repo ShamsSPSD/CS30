@@ -16,6 +16,8 @@ function draw() {
   //background(220);
 }
 
+class Kars
+
 
 function drawroad(){
   fill(0)
@@ -24,6 +26,6 @@ function drawroad(){
   let space = 30;
   for(let i = 0; i < width; i++){
     fill(255);
-    rect(i * 50,height/2,30,20);
+    rect(i * 70,height/2,30,10);
   }
 }
