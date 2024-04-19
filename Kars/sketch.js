@@ -16,7 +16,12 @@ function draw() {
   //background(220);
 }
 
-class Kars
+class Kars{
+  constructor(type,colour,x,y,xspeed,direct){
+    
+  }
+
+}
 
 
 function drawroad(){
