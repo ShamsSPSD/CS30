@@ -18,9 +18,12 @@ function draw() {
 
 class Kars{
   constructor(type,colour,x,y,xspeed,direct){
-    
+
   }
 
+
+
+  
 }
 
 
