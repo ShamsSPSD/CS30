@@ -18,13 +18,38 @@ function draw() {
 
 class Kars{
   constructor(type,colour,x,y,xspeed,direct){
+    this.x = x;
+    this.y = y;
+    this.direct = round(random(0,2));
+    this.colour = colour(random(255),random(255),random(255));
+    this.type = int(random(2));
+    this.xspeed = (random(20));
+
+
+  }
+
+  move(){
+    if(this.direct === 0){
+      this.x += this.xspeed();
+      if(this.x > width + 40){
+        this.x = width - 200;
+
+      }
+    }
+    if(this.direct === 2){
+      this.x -= this.xspeed();
+      if(this.x > width + 40){
+        this.x = width - 200;
+
+  }
+}
+  }
+  
+  display(){
 
   }
 
 
-
-  
-}
 
 
 function drawroad(){
