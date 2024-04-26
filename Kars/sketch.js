@@ -44,11 +44,11 @@ class Kars{
   }
 }
   }
-  
+
   display(){
-
+    if(this.type === );
   }
-
+}
 
 
 
