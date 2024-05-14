@@ -55,14 +55,8 @@ class Kars{
 
   }
   truck(){
-    rect(this.x, this.y, 30,60);
-    fill(random(1,255));
-    rect(this.x, this.y, 30,30);
-    fill(random(1,255));
-    rect(length/2, + 5,width/2, - 5, 5,5)
-    rect(length/2, - 5,width/2, - 5, 5,5)
-    rect(length/2, + 5,width/2, + 5, 5,5)
-    rect(length/2, + 5,width/2, + 5, 5,5)
+    
+  
   }
 }
 
