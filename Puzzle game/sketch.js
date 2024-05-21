@@ -1,6 +1,7 @@
-// Puzzle Game Starter
-// Mr. Scott
-// April 23, 2024
+//puzzle game 
+//Omar shams
+//overdue
+
 
 let grid =
 [ [0,    255,    0,  255,   0],
@@ -9,7 +10,7 @@ let grid =
   [255,  255,    0,  255,  255]
 ];
 
-let squareSize = 50;
+let squareSize = 100;
 const NUM_ROWS = 4; const NUM_COLS = 5;
 
 let row, col;
@@ -25,10 +26,27 @@ function draw() {
   drawGrid();
 }
 
-function mousePressed(){
-  flip(col, row);
-}
 
+function mousePressed(){
+  if (keyIsPressed && keyCode == SHIFT){
+    flip(col, row);
+  } 
+  else{
+  flip(col, row);
+
+  flip(col+1, row);
+  flip(col-1, row);
+  if (row < 3){
+    flip(col, row+1);
+  }
+  if (row > 0){
+    flip(col, row-1);
+  }
+  
+
+
+}
+}
 function flip(x,y){
   if(grid[y][x]===0) grid[y][x]=255;
   else grid[y][x] = 0;
@@ -36,7 +54,7 @@ function flip(x,y){
 
 function getCurrentY(){
   //determine current row of mouse, and return
-  let constrainY = constrain(mouseY, 0, height-1);
+  let constrainY = constrain(mouseY, 0, height);
   return int(constrainY/squareSize);
 }
 
