@@ -1,13 +1,12 @@
 //puzzle game 
 //Omar shams
-//overdue
 
-
+let countCorrect = 20;
 let grid =
-[ [0,    255,    0,  255,   0],
-  [0,      0,  255,    0,   0],
-  [0,    255,  255,    0,  255],
-  [255,  255,    0,  255,  255]
+[ [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
+  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
+  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
+  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()]
 ];
 
 let squareSize = 100;
@@ -24,7 +23,21 @@ function draw() {
   row = getCurrentY();  print(col, row);
   background(220);
   drawGrid();
+  winc();
+  highlight(col,row);
 }
+
+function randoizer(){
+  let ran = (Math.round(Math.random(1,0)));
+  if (ran === 1){
+    return 255;
+  }
+  else{
+    return 0;
+  }
+}
+
+
 
 
 function mousePressed(){
@@ -42,15 +55,53 @@ function mousePressed(){
   if (row > 0){
     flip(col, row-1);
   }
-  
-
-
 }
 }
 function flip(x,y){
   if(grid[y][x]===0) grid[y][x]=255;
   else grid[y][x] = 0;
 }
+
+function highlight(){
+  for (let y = 0; y < NUM_ROWS; y++) {
+    for (let x = 0; x < NUM_COLS; x++) {
+      if(gird[x] === mouseX && grid[y] === mouseY){
+      fill(0,255,0,100);
+    rect(col,row,100);
+      }     
+  }
+}
+}
+
+function winc(){
+    let allValuesSame = true;
+    let firstValue = grid[0][0];
+    
+    for (let y = 0; y < NUM_ROWS; y++) {
+      for (let x = 0; x < NUM_COLS; x++) {
+        let fillValue = grid[y][x];
+        console.log(`grid[${y}][${x}] = ${fillValue}`);
+        fill(fillValue);
+        square(x * squareSize, y * squareSize, squareSize);
+  
+        // Check if the current value is different from the first value
+        if (fillValue !== firstValue) {
+          allValuesSame = false;
+        }
+      }
+    }
+    
+    // If all values in the grid are the same, display "You win"
+    if (allValuesSame) {
+      textSize(32);
+      let textColor = (firstValue === 255) ? 0 : 255; // Black text for white grid, white text for black grid
+      fill(textColor); // Set the text color
+      textAlign(CENTER, CENTER);
+      text("You win", width / 2, height / 2);
+    }
+  }
+  
+ 
 
 function getCurrentY(){
   //determine current row of mouse, and return
