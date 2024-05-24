@@ -1,131 +1,141 @@
-//puzzle game 
-//Omar shams
+//Omar Shams 
+//Puzzle game
+// 5/24/2024
 
-let countCorrect = 20;
-let grid =
-[ [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
-  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
-  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()],
-  [randoizer(), randoizer(), randoizer(),randoizer(), randoizer()]
-];
 
-let squareSize = 100;
-const NUM_ROWS = 4; const NUM_COLS = 5;
 
-let row, col;
+const NUM_ROWS = 4;
+const NUM_COLS = 5;
+const SQUARE_SIZE = 100;
+
+let grid = [];
+let clickCount = 0;
+let state = "cross";
+let currentRow, currentCol;
 
 function setup() {
-  createCanvas(NUM_COLS * squareSize, NUM_ROWS * squareSize);
+  createCanvas(NUM_COLS * SQUARE_SIZE, NUM_ROWS * SQUARE_SIZE);
+  initializeGrid();
 }
 
 function draw() {
-  col = getCurrentX();
-  row = getCurrentY();  print(col, row);
   background(220);
+  Activesquare();
   drawGrid();
-  winc();
-  highlight(col,row);
+  winCondition();
+  highlight(currentCol, currentRow);
 }
 
-function randoizer(){
-  let ran = (Math.round(Math.random(1,0)));
-  if (ran === 1){
-    return 255;
-  }
-  else{
-    return 0;
+function initializeGrid() {
+  for (let y = 0; y < NUM_ROWS; y++) {
+    let row = [];
+    for (let x = 0; x < NUM_COLS; x++) {
+      row.push(randomizer());
+    }
+    grid.push(row);
   }
 }
 
+function randomizer() {
+  return Math.round(Math.random()) * 255;
+}
 
+function mousePressed() {
+  clickCount++;
+  if (keyIsPressed && keyCode === SHIFT) {
+    flip(currentCol, currentRow);
+  } else {
+    if (state === "cross") {
+      flipCross(currentCol, currentRow);
+    } else {
+      flipSquare(currentCol, currentRow);
+    }
+  }
+  
+}
 
+function flip(x, y) {
+  if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
+    grid[y][x] = grid[y][x] === 0 ? 255 : 0;
+  }
+}
 
-function mousePressed(){
-  if (keyIsPressed && keyCode == SHIFT){
-    flip(col, row);
-  } 
-  else{
+function flipCross(col, row) {
   flip(col, row);
-
-  flip(col+1, row);
-  flip(col-1, row);
-  if (row < 3){
-    flip(col, row+1);
-  }
-  if (row > 0){
-    flip(col, row-1);
-  }
-}
-}
-function flip(x,y){
-  if(grid[y][x]===0) grid[y][x]=255;
-  else grid[y][x] = 0;
+  flip(col - 1, row);
+  flip(col + 1, row);
+  flip(col, row - 1);
+  flip(col, row + 1);
 }
 
-function highlight(){
+function flipSquare(col, row) {
+  flip(col, row);
+  flip(col + 1, row);
+  flip(col, row + 1);
+  flip(col + 1, row + 1);
+}
+
+function highlight(col, row) {
+  fill(144, 238, 144, 120);
+  if (state === "cross") {
+    HG(col, row);
+    HG(col - 1, row);
+    HG(col + 1, row);
+    HG(col, row - 1);
+    HG(col, row + 1);
+  } else {
+    HG(col, row);
+    HG(col, row + 1);
+    HG(col + 1, row);
+    HG(col + 1, row + 1);
+  }
+}
+
+function HG(col, row) {
+  if (col >= 0 && col < NUM_COLS && row >= 0 && row < NUM_ROWS) {
+    rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+  }
+}
+
+function Activesquare() {
+  currentCol = int(mouseX / SQUARE_SIZE);
+  currentRow = int(mouseY / SQUARE_SIZE);
+}
+
+function drawGrid() {
   for (let y = 0; y < NUM_ROWS; y++) {
     for (let x = 0; x < NUM_COLS; x++) {
-      if(gird[x] === mouseX && grid[y] === mouseY){
-      fill(0,255,0,100);
-    rect(col,row,100);
-      }     
+      fill(grid[y][x]);
+      rect(x * SQUARE_SIZE, y * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+    }
   }
 }
-}
 
-function winc(){
-    let allValuesSame = true;
-    let firstValue = grid[0][0];
-    
-    for (let y = 0; y < NUM_ROWS; y++) {
-      for (let x = 0; x < NUM_COLS; x++) {
-        let fillValue = grid[y][x];
-        console.log(`grid[${y}][${x}] = ${fillValue}`);
-        fill(fillValue);
-        square(x * squareSize, y * squareSize, squareSize);
+function winCondition() {
+  let firstValue = grid[0][0];
+  let allValuesSame = true;
   
-        // Check if the current value is different from the first value
-        if (fillValue !== firstValue) {
-          allValuesSame = false;
-        }
+  for (let y = 0; y < NUM_ROWS; y++) {
+    for (let x = 0; x < NUM_COLS; x++) {
+      if (grid[y][x] !== firstValue) {
+        allValuesSame = false;
+        break;
       }
     }
-    
-    // If all values in the grid are the same, display "You win"
-    if (allValuesSame) {
-      textSize(32);
-      let textColor = (firstValue === 255) ? 0 : 255; // Black text for white grid, white text for black grid
-      fill(textColor); // Set the text color
-      textAlign(CENTER, CENTER);
-      text("You win", width / 2, height / 2);
-    }
+    if (!allValuesSame) break;
   }
-  
- 
 
-function getCurrentY(){
-  //determine current row of mouse, and return
-  let constrainY = constrain(mouseY, 0, height);
-  return int(constrainY/squareSize);
-}
-
-function getCurrentX(){
-  //determine the current column of the mouse, and return
-  let constrainX = constrain(mouseX, 0, width-1);
-  return int(constrainX/squareSize);
-}
-
-function drawGrid(){
-  // Read data from our 2D Array (grid), and use the 
-  // numbers there to set the color for squares which are
-  // arranged in a grid fashion.
-  for(let y = 0; y<NUM_ROWS; y++){
-    for(let x = 0; x<NUM_COLS; x++){
-      let fillValue = grid[y][x];
-      fill(fillValue);
-      //             x:   0 ,   1,     2,    3,     4  
-      //squareSize*x:     0     50    100    150    200
-      square(x*squareSize, y*squareSize, squareSize);
-    }  
+  if (allValuesSame) {
+    textSize(32);
+    fill(firstValue === 255 ? 0 : 255);
+    textAlign(CENTER, CENTER);
+    text("YOU WIN!", width / 2, height / 2);
   }
 }
+
+function keyPressed() {
+  if (keyCode === 32) {
+    state = (state === "cross") ? "square" : "cross";
+  }
+}
+
