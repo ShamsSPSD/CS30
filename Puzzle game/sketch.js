@@ -1,20 +1,23 @@
 //Omar Shams 
 //Puzzle game
 // 5/24/2024
+//finally done
 
-
-
+//defining variables
 const NUM_ROWS = 4;
 const NUM_COLS = 5;
 const SQUARE_SIZE = 100;
 
+//creates the grid ,and other variables
 let grid = [];
 let clickCount = 0;
 let state = "cross";
 let currentRow, currentCol;
 
+
 function setup() {
   createCanvas(NUM_COLS * SQUARE_SIZE, NUM_ROWS * SQUARE_SIZE);
+  //adds rows and columns to the array making the grid
   initializeGrid();
 }
 
@@ -36,12 +39,13 @@ function initializeGrid() {
   }
 }
 
+//makes a value for black and white squares
 function randomizer() {
   return Math.round(Math.random()) * 255;
 }
 
+//when the mouse is pressed if the spacebar has been pressed makes a square change otherwise flips a cross
 function mousePressed() {
-  clickCount++;
   if (keyIsPressed && keyCode === SHIFT) {
     flip(currentCol, currentRow);
   } else {
@@ -53,13 +57,14 @@ function mousePressed() {
   }
   
 }
-
+//what the flip is
 function flip(x, y) {
   if (x >= 0 && x < NUM_COLS && y >= 0 && y < NUM_ROWS) {
-    grid[y][x] = grid[y][x] === 0 ? 255 : 0;
+    grid[y][x] = grid[y][x] === 0 ? 255 : 0; // this type of code is used alot in the project it essentially checks a value and returns a
+                                             // a value depending if it is true or not
   }
 }
-
+//if cross is the state flips in a cross shape
 function flipCross(col, row) {
   flip(col, row);
   flip(col - 1, row);
@@ -67,14 +72,14 @@ function flipCross(col, row) {
   flip(col, row - 1);
   flip(col, row + 1);
 }
-
+//same but with square
 function flipSquare(col, row) {
   flip(col, row);
   flip(col + 1, row);
   flip(col, row + 1);
   flip(col + 1, row + 1);
 }
-
+// Highlights the squares to switch
 function highlight(col, row) {
   fill(144, 238, 144, 120);
   if (state === "cross") {
@@ -91,6 +96,7 @@ function highlight(col, row) {
   }
 }
 
+//HG is what highlights the grid creating the translucent square or cross in green
 function HG(col, row) {
   if (col >= 0 && col < NUM_COLS && row >= 0 && row < NUM_ROWS) {
     rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
@@ -101,7 +107,7 @@ function Activesquare() {
   currentCol = int(mouseX / SQUARE_SIZE);
   currentRow = int(mouseY / SQUARE_SIZE);
 }
-
+//creates the grid
 function drawGrid() {
   for (let y = 0; y < NUM_ROWS; y++) {
     for (let x = 0; x < NUM_COLS; x++) {
@@ -111,6 +117,7 @@ function drawGrid() {
   }
 }
 
+//checks if all the values in the array are the same and places text to signify end
 function winCondition() {
   let firstValue = grid[0][0];
   let allValuesSame = true;
@@ -133,6 +140,7 @@ function winCondition() {
   }
 }
 
+//when space is pressed change state
 function keyPressed() {
   if (keyCode === 32) {
     state = (state === "cross") ? "square" : "cross";
