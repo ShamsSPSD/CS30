@@ -1,5 +1,8 @@
-// Find my blog at https://codeheir.com/
-// I do a lot of p5.js stuff that might interest you!
+//Omar shams
+// Zombjs 
+//5/27/2024
+
+
 
 let player;
 let zombies = [];
