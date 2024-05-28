@@ -60,3 +60,9 @@ function draw() {
 function mouseClicked() {
   player.shoot();
 }
+
+
+
+
+//this is simply a chekc too see if it will have parity between 
+//computers
