@@ -1,5 +1,5 @@
-// Find my blog at https://codeheir.com/
-// I do a lot of p5.js stuff that might interest you!
+//Omar Shams
+//sa
 
 let player;
 let zombies = [];
@@ -13,27 +13,40 @@ function setup() {
   createCanvas(700, 700);
   imageMode(CENTER);
   player = new Player();
-  zombies.push(new Zombie(random(speed)));
+  zombies.push(new Zombie(1));
 }
 
-function draw() {
 
-  rect(width/2,height/2,width,height)
+
+
+
+function draw() {
+  background(255);
+  let shiftX = width/2  - player.pos.x;
+  let shiftY = height/2  - player.pos.y;
+  player.pos.set(width / 2, height / 2);
+  for (let zombie of zombies) {
+    zombie.pos.add(shiftX/5, shiftY/5);
+  }
   
+  for (let x = 0; x < width; x += width/7 ) {
+		for (let y = 0; y < height; y += height/7) {
+        rect(x+shiftX/5,y+shiftX/5,200,200);
+    }
+  Centerplayer();
   frame++;
-  player.draw();
+  player.display();
   player.update();
   
   for (let i = zombies.length - 1; i >= 0; i--) {
-    zombies[i].draw();
+    zombies[i].display();
     zombies[i].update();
     if (player.shot(zombies[i])) {
       zombies.splice(i, 1);
-      score++;
     }
   }
   
-  if (frame > framesTillCreate && zombies.length < 300) {
+  if (frame > framesTillCreate && zombies.length < 10) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
     if (framesTillCreate > 20) {
@@ -41,12 +54,18 @@ function draw() {
     }
   }
   
-  if (frameCount % 1000 == 0) {
+  if (frameCount % 100 == 0) {
     speed+=0.1;
   }
-  
+}
   
 }
+
+function Centerplayer() {
+  
+
+}
+
 
 
 
@@ -59,11 +78,11 @@ class Bullet {
     this.x = x;
     this.y = y;
     this.angle = angle;
-    this.speed = 16;
+    this.speed = 1;
   }
   
   
-  draw() {
+  display() {
     push();
     fill(0);
     circle(this.x, this.y, 5);
@@ -83,7 +102,7 @@ class Player {
     this.angle = 0;
   }
 
-  draw() {
+  display() {
     rectMode(CENTER);
     push();
     translate(this.pos.x, this.pos.y);
@@ -94,7 +113,7 @@ class Player {
     
     
     for (let bullet of this.bullets) {
-      bullet.draw();
+      bullet.display();
       bullet.update();
     }
     
@@ -108,19 +127,19 @@ class Player {
     let sidewaysSpeed = 0;
     let forwardSpeed = 0;
     if (keyIsDown(65)) {
-      sidewaysSpeed = -2;
+      sidewaysSpeed = -20;
     }
 
     if (keyIsDown(68)) {
-      sidewaysSpeed = 2;
+      sidewaysSpeed = 20;
     }
 
     if (keyIsDown(87)) {
-      forwardSpeed = -2;
+      forwardSpeed = -20;
     }
 
     if (keyIsDown(83)) {
-      forwardSpeed = 2;
+      forwardSpeed = 20;
     }
     
     this.pos.add(sidewaysSpeed, forwardSpeed);
@@ -164,7 +183,7 @@ class Zombie {
   }
   
   
-  draw() {
+  display() {
     angleMode(degrees);
     rectMode(CENTER);
     push();
@@ -173,7 +192,6 @@ class Zombie {
     rotate(this.angle);
     fill(100, 255, 100);
     rect( 0, 0, 20, 20);
-    //rect(0, 0, 20, 20);
     pop();
   }
   
