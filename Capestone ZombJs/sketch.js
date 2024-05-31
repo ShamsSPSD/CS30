@@ -6,8 +6,9 @@ let framesTillCreate = 100;
 let frame = 0;
 let speed = 2;
 let score = 0;
-let gridSize = 50; // Size of each grid cell
-let mapSize = 1000; // Size of the map (width and height)
+let gridSize = 50; 
+let mapSize = 1000;
+let playerHealth = 100;
 
 function setup() {
   createCanvas(700, 700);
@@ -31,10 +32,13 @@ function draw() {
     if (player.shot(zombies[i])) {
       zombies.splice(i, 1);
       score++;
+    } else if (player.collidesWith(zombies[i])) {
+      playerHealth -= 1;
+      player.pushBack(zombies[i]);
     }
   }
 
-  if (frame > framesTillCreate && zombies.length < 2) {
+  if (frame > framesTillCreate && zombies.length < 3) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
     if (framesTillCreate > 20) {
@@ -46,16 +50,24 @@ function draw() {
     speed += 0.1;
   }
 
-
+  // Draw the health meter
+  drawHealthMeter();
 }
 
 function drawGrid() {
 
   for (let x = 0; x < mapSize; x += gridSize) {
     for (let y = 0; y < mapSize; y += gridSize) {
+      fill(225)
       rect(x, y, gridSize, gridSize);
     }
   }
+}
+
+function drawHealthMeter() {
+  fill(255, 0, 0);
+  rect(player.pos.x - width / 2 + 20, player.pos.y - height / 2 + 20, playerHealth, 10);
+  
 }
 
 function mouseClicked() {
@@ -145,6 +157,16 @@ class Player {
 
   shoot() {
     this.bullets.push(new Bullet(this.pos.x, this.pos.y, this.angle));
+  }
+
+  collidesWith(zombie) {
+    return dist(this.pos.x, this.pos.y, zombie.pos.x, zombie.pos.y) < 15;
+  }
+
+  pushBack(zombie) {
+    let direction = p5.Vector.sub(this.pos, zombie.pos);
+    direction.normalize();
+    this.pos.add(direction.mult(10));
   }
 }
 
