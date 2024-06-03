@@ -6,7 +6,7 @@ let framesTillCreate = 100;
 let frame = 0;
 let speed = 2;
 let score = 0;
-let gridSize = 50; 
+let gridSize = 60; 
 let mapSize = 1000;
 let playerHealth = 100;
 
@@ -38,7 +38,7 @@ function draw() {
     }
   }
 
-  if (frame > framesTillCreate && zombies.length < 3) {
+  if (frame > framesTillCreate && zombies.length < 2) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
     if (framesTillCreate > 20) {
@@ -50,7 +50,6 @@ function draw() {
     speed += 0.1;
   }
 
-  // Draw the health meter
   drawHealthMeter();
 }
 
@@ -59,7 +58,7 @@ function drawGrid() {
   for (let x = 0; x < mapSize; x += gridSize) {
     for (let y = 0; y < mapSize; y += gridSize) {
       fill(225)
-      rect(x, y, gridSize, gridSize);
+      rect(x+20, y+20, gridSize, gridSize);
     }
   }
 }
@@ -166,7 +165,7 @@ class Player {
   pushBack(zombie) {
     let direction = p5.Vector.sub(this.pos, zombie.pos);
     direction.normalize();
-    this.pos.add(direction.mult(10));
+    this.pos.add(direction.mult(7));
   }
 }
 
@@ -181,20 +180,20 @@ class Zombie {
     let edge = floor(random(4));
     switch (edge) {
       case 0: // top
-        this.x = random(mapSize);
-        this.y = -20;
+        this.x = mapSize;
+        this.y = mapSize;
         break;
       case 1: // right
-        this.x = mapSize + 20;
-        this.y = random(mapSize);
+        this.x = mapSize;
+        this.y = mapSize;
         break;
       case 2: // bottom
-        this.x = random(mapSize);
-        this.y = mapSize + 20;
+        this.x = mapSize;
+        this.y = mapSize;
         break;
       case 3: // left
-        this.x = -20;
-        this.y = random(mapSize);
+        this.x = mapSize;
+        this.y = mapSize;
         break;
     }
     this.pos = createVector(this.x, this.y);
