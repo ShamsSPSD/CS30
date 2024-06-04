@@ -1,14 +1,16 @@
 //Omar Shams
 //5/30/2024
+
 let player;
 let zombies = [];
 let framesTillCreate = 100;
 let frame = 0;
-let speed = 2;
+let speed = 1;
 let score = 0;
 let gridSize = 60; 
 let mapSize = 1000;
 let playerHealth = 100;
+let Modeselect = 0;
 
 function setup() {
   createCanvas(700, 700);
@@ -18,6 +20,9 @@ function setup() {
 }
 
 function draw() {
+  if (playerHealth <= 0) {
+    noLoop();
+  }
   background(255);
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
   drawGrid();
@@ -30,15 +35,22 @@ function draw() {
     zombies[i].display();
     zombies[i].update();
     if (player.shot(zombies[i])) {
-      zombies.splice(i, 1);
-      score++;
+      zombies[i].health -= 50;
+      if (zombies[i].health <= 0) {
+        zombies.splice(i, 1);
+        score++;
+      }
     } else if (player.collidesWith(zombies[i])) {
       playerHealth -= 1;
+      if (playerHealth <= 0){
+        playerHealth = 0;
+      }
       player.pushBack(zombies[i]);
+      zombies[i].pushBack(player);
     }
   }
 
-  if (frame > framesTillCreate && zombies.length < 2) {
+  if (frame > framesTillCreate && zombies.length < 1) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
     if (framesTillCreate > 20) {
@@ -54,19 +66,17 @@ function draw() {
 }
 
 function drawGrid() {
-
-  for (let x = 0; x < mapSize; x += gridSize) {
-    for (let y = 0; y < mapSize; y += gridSize) {
-      fill(225)
-      rect(x+20, y+20, gridSize, gridSize);
+  for (let x = 0; x <= mapSize; x += gridSize) {
+    for (let y = 0; y <= mapSize; y += gridSize) {
+      fill(225);
+      rect(x, y, gridSize, gridSize);
     }
   }
 }
 
 function drawHealthMeter() {
   fill(255, 0, 0);
-  rect(player.pos.x - width / 2 + 20, player.pos.y - height / 2 + 20, playerHealth, 10);
-  
+  rect(player.pos.x - width / 2 + 350, player.pos.y - height / 2 + 320, playerHealth / 2, 10);
 }
 
 function mouseClicked() {
@@ -105,8 +115,7 @@ class Player {
     rectMode(CENTER);
     push();
     translate(this.pos.x, this.pos.y);
-    this.angle = atan2(mouseY - height / 2, mouseX - width / 2); // Adjust for translated context
-    rotate(this.angle);
+    this.angle = atan2(mouseY - height / 2, mouseX - width / 2); 
     rect(0, 0, 10, 10);
     pop();
 
@@ -173,27 +182,28 @@ class Zombie {
   constructor(speed) {
     this.speed = speed;
     this.angle = 0;
+    this.health = 100;
     this.spawnOutsideCanvas();
   }
 
   spawnOutsideCanvas() {
     let edge = floor(random(4));
     switch (edge) {
-      case 0: // top
+      case 0: 
+        this.x = random(mapSize);
+        this.y = 0;
+        break;
+      case 1: 
         this.x = mapSize;
+        this.y = random(mapSize);
+        break;
+      case 2: 
+        this.x = random(mapSize);
         this.y = mapSize;
         break;
-      case 1: // right
-        this.x = mapSize;
-        this.y = mapSize;
-        break;
-      case 2: // bottom
-        this.x = mapSize;
-        this.y = mapSize;
-        break;
-      case 3: // left
-        this.x = mapSize;
-        this.y = mapSize;
+      case 3: 
+        this.x = 0;
+        this.y = random(mapSize);
         break;
     }
     this.pos = createVector(this.x, this.y);
@@ -209,11 +219,22 @@ class Zombie {
     fill(100, 255, 100);
     rect(0, 0, 20, 20);
     pop();
+
+    fill(255, 0, 0);
+    rect(this.pos.x - 10, this.pos.y - 20, 20, 3);
+    fill(0, 255, 0);
+    rect(this.pos.x - 10, this.pos.y - 20, this.health / 5, 3);
   }
 
   update() {
     let difference = p5.Vector.sub(player.pos, this.pos);
     difference.limit(this.speed);
     this.pos.add(difference);
+  }
+
+  pushBack(player) {
+    let direction = p5.Vector.sub(this.pos, player.pos);
+    direction.normalize();
+    this.pos.add(direction.mult(7));
   }
 }
