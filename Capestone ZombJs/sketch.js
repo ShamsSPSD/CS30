@@ -3,7 +3,7 @@
 
 let player;
 let zombies = [];
-let framesTillCreate = 100;
+let framesTillCreate = 1000;
 let frame = 0;
 let speed = 1;
 let score = 0;
@@ -11,6 +11,8 @@ let gridSize = 60;
 let mapSize = 1000;
 let playerHealth = 100;
 let Modeselect = 0;
+let shootInterval = 15; 
+let lastShotFrame = shootInterval;
 
 function setup() {
   createCanvas(700, 700);
@@ -20,6 +22,9 @@ function setup() {
 }
 
 function draw() {
+  if (Modeselect = 0){
+    
+  }
   if (playerHealth <= 0) {
     noLoop();
   }
@@ -27,7 +32,6 @@ function draw() {
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
   drawGrid();
 
-  frame++;
   player.display();
   player.update();
 
@@ -35,7 +39,7 @@ function draw() {
     zombies[i].display();
     zombies[i].update();
     if (player.shot(zombies[i])) {
-      zombies[i].health -= 50;
+      zombies[i].health -= 10;
       if (zombies[i].health <= 0) {
         zombies.splice(i, 1);
         score++;
@@ -63,13 +67,20 @@ function draw() {
   }
 
   drawHealthMeter();
+
+  if (mouseIsPressed && (frame + lastShotFrame >= shootInterval)) {
+    console.log(frame);
+    player.shoot();
+    lastShotFrame = frame;
+    console.log(lastShotFrame);
+  }
 }
 
 function drawGrid() {
   for (let x = 0; x <= mapSize; x += gridSize) {
     for (let y = 0; y <= mapSize; y += gridSize) {
       fill(225);
-      rect(x, y, gridSize, gridSize);
+      rect(x+20, y+20, gridSize, gridSize);
     }
   }
 }
@@ -77,10 +88,6 @@ function drawGrid() {
 function drawHealthMeter() {
   fill(255, 0, 0);
   rect(player.pos.x - width / 2 + 350, player.pos.y - height / 2 + 320, playerHealth / 2, 10);
-}
-
-function mouseClicked() {
-  player.shoot();
 }
 
 class Bullet {
@@ -116,6 +123,7 @@ class Player {
     push();
     translate(this.pos.x, this.pos.y);
     this.angle = atan2(mouseY - height / 2, mouseX - width / 2); 
+    rotate(this.angle);
     rect(0, 0, 10, 10);
     pop();
 
@@ -124,9 +132,6 @@ class Player {
       bullet.update();
     }
 
-    if (this.bullets.length > 20) {
-      this.bullets.splice(0, 1);
-    }
   }
 
   update() {
@@ -189,11 +194,11 @@ class Zombie {
   spawnOutsideCanvas() {
     let edge = floor(random(4));
     switch (edge) {
-      case 0: 
+      case 0: // top
         this.x = random(mapSize);
         this.y = 0;
         break;
-      case 1: 
+      case 1:
         this.x = mapSize;
         this.y = random(mapSize);
         break;
