@@ -1,30 +1,31 @@
 //Omar Shams
 //5/30/2024
 
+let weaponselect = 20;
 let player;
 let zombies = [];
 let framesTillCreate = 1000;
 let frame = 0;
 let speed = 1;
 let score = 0;
-let gridSize = 60; 
+let gridSize = 60;
 let mapSize = 1000;
 let playerHealth = 100;
 let Modeselect = 0;
-let shootInterval = 15; 
-let lastShotFrame = shootInterval;
+let shootInterval = 15;
 
 function setup() {
   createCanvas(700, 700);
   imageMode(CENTER);
   player = new Player();
-  zombies.push(new Zombie(5));
+  zombies.push(new Zombie(3));
 }
 
 function draw() {
-  if (Modeselect = 0){
+  if (Modeselect == 0) {
     
   }
+
   if (playerHealth <= 0) {
     noLoop();
   }
@@ -46,7 +47,7 @@ function draw() {
       }
     } else if (player.collidesWith(zombies[i])) {
       playerHealth -= 1;
-      if (playerHealth <= 0){
+      if (playerHealth <= 0) {
         playerHealth = 0;
       }
       player.pushBack(zombies[i]);
@@ -54,11 +55,15 @@ function draw() {
     }
   }
 
-  if (frame > framesTillCreate && zombies.length < 1) {
+  if (frame > framesTillCreate && zombies.length < 10) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
-    if (framesTillCreate > 20) {
-      framesTillCreate *= 0.95;
+  }
+
+  if (framesTillCreate > 20) {
+    framesTillCreate *= 0.95;
+    if (framesTillCreate < 20) {
+      framesTillCreate = 20; 
     }
   }
 
@@ -68,19 +73,18 @@ function draw() {
 
   drawHealthMeter();
 
-  if (mouseIsPressed && (frame + lastShotFrame >= shootInterval)) {
-    console.log(frame);
+  if (mouseIsPressed && frameCount % shootInterval === 0) {
     player.shoot();
-    lastShotFrame = frame;
-    console.log(lastShotFrame);
   }
+
+  frame++;
 }
 
 function drawGrid() {
   for (let x = 0; x <= mapSize; x += gridSize) {
     for (let y = 0; y <= mapSize; y += gridSize) {
       fill(225);
-      rect(x+20, y+20, gridSize, gridSize);
+      rect(x+15, y+15, gridSize, gridSize);
     }
   }
 }
@@ -122,7 +126,7 @@ class Player {
     rectMode(CENTER);
     push();
     translate(this.pos.x, this.pos.y);
-    this.angle = atan2(mouseY - height / 2, mouseX - width / 2); 
+    this.angle = atan2(mouseY - height / 2, mouseX - width / 2);
     rotate(this.angle);
     rect(0, 0, 10, 10);
     pop();
@@ -131,7 +135,6 @@ class Player {
       bullet.display();
       bullet.update();
     }
-
   }
 
   update() {
@@ -194,7 +197,7 @@ class Zombie {
   spawnOutsideCanvas() {
     let edge = floor(random(4));
     switch (edge) {
-      case 0: // top
+      case 0:
         this.x = random(mapSize);
         this.y = 0;
         break;
@@ -202,11 +205,11 @@ class Zombie {
         this.x = mapSize;
         this.y = random(mapSize);
         break;
-      case 2: 
+      case 2:
         this.x = random(mapSize);
         this.y = mapSize;
         break;
-      case 3: 
+      case 3:
         this.x = 0;
         this.y = random(mapSize);
         break;
