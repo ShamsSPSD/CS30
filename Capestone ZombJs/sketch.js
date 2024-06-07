@@ -1,7 +1,7 @@
 //Omar Shams
 //5/30/2024
 
-let weaponselect = 20;
+let weaponselect = 10;
 let player;
 let zombies = [];
 let framesTillCreate = 1000;
@@ -22,14 +22,35 @@ function setup() {
 }
 
 function draw() {
+  background(255);
+
   if (Modeselect == 0) {
-    
+    startScreen();
+  } else if (Modeselect == 1) {
+    gameScreen();
+  } else if (Modeselect == 2) {
+    gameOverScreen();
+  }
+}
+
+function startScreen() {
+  fill(0);
+  textAlign(CENTER);
+  textSize(32);
+  text("Zombie Game", width / 2, height / 2 - 40);
+  textSize(24);
+  text("Press Enter to Start", width / 2, height / 2);
+  if (keyIsPressed && keyCode === ENTER) {
+    Modeselect = 3;
   }
 
+}
+
+function gameScreen() {
   if (playerHealth <= 0) {
-    noLoop();
+    Modeselect = 2;
   }
-  background(255);
+  
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
   drawGrid();
 
@@ -72,12 +93,25 @@ function draw() {
   }
 
   drawHealthMeter();
+  drawScore();
 
-  if (mouseIsPressed && frameCount % shootInterval === 0) {
+  if (mouseIsPressed && frameCount % weaponselect === 0) {
     player.shoot();
   }
 
   frame++;
+}
+
+function gameOverScreen() {
+  fill(0);
+  textAlign(CENTER);
+  textSize(32);
+  text("Game Over", width / 2, height / 2 - 40);
+  textSize(24);
+  text("Press Enter to Restart", width / 2, height / 2);
+  if (keyIsPressed && keyCode === ENTER) {
+    restartGame();
+  }
 }
 
 function drawGrid() {
@@ -92,6 +126,24 @@ function drawGrid() {
 function drawHealthMeter() {
   fill(255, 0, 0);
   rect(player.pos.x - width / 2 + 350, player.pos.y - height / 2 + 320, playerHealth / 2, 10);
+}
+
+function drawScore() {
+  fill(0);
+  textAlign(LEFT);
+  textSize(16);
+  text("Score: " + score, player.pos.x - width / 2 + 10, player.pos.y - height / 2 + 30);
+}
+
+function restartGame() {
+  playerHealth = 100;
+  score = 0;
+  speed = 1;
+  frame = 0;
+  framesTillCreate = 1000;
+  zombies = [];
+  player.pos = createVector(mapSize / 2, mapSize / 2);
+  Modeselect = 1;
 }
 
 class Bullet {
@@ -246,3 +298,4 @@ class Zombie {
     this.pos.add(direction.mult(7));
   }
 }
+
