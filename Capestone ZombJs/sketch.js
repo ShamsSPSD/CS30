@@ -4,6 +4,7 @@
 let weaponselect = 10;
 let player;
 let zombies = [];
+let healthPacks = [];
 let framesTillCreate = 1000;
 let frame = 0;
 let speed = 1;
@@ -13,6 +14,17 @@ let mapSize = 1000;
 let playerHealth = 100;
 let Modeselect = 0;
 let shootInterval = 15;
+
+const WEAPONS = {
+  pistol: { interval: 15, damage: 10 },
+  rifle: { interval: 10, damage: 20 },
+  shotgun: { interval: 30, damage: 50 },
+};
+
+let currentWeapon = 'pistol';
+
+let menuOptions = ["Play Game", "Controls", "Exit"];
+let selectedOption = 0;
 
 function setup() {
   createCanvas(700, 700);
@@ -24,33 +36,82 @@ function setup() {
 function draw() {
   background(255);
 
-  if (Modeselect == 0) {
-    startScreen();
-  } else if (Modeselect == 1) {
-    gameScreen();
-  } else if (Modeselect == 2) {
-    gameOverScreen();
+  switch (Modeselect) {
+    case 0:
+      drawStartScreen();
+      break;
+    case 1:
+      drawGameScreen();
+      break;
+    case 2:
+      drawGameOverScreen();
+      break;
+    case 3:
+      drawControlsScreen();
+      break;
   }
 }
 
-function startScreen() {
+function drawStartScreen() {
   fill(0);
   textAlign(CENTER);
   textSize(32);
-  text("Zombie Game", width / 2, height / 2 - 40);
-  textSize(24);
-  text("Press Enter to Start", width / 2, height / 2);
-  if (keyIsPressed && keyCode === ENTER) {
-    Modeselect = 3;
+  text("Zombie Game", width / 2, height / 2 - 100);
+
+  for (let i = 0; i < menuOptions.length; i++) {
+    if (i === selectedOption) {
+      fill(0, 102, 153);
+    } else {
+      fill(0);
+    }
+    textSize(24);
+    text(menuOptions[i], width / 2, height / 2 - 40 + i * 40);
   }
 
+  if (keyIsPressed) {
+    if (keyCode === ENTER) {
+      handleMenuSelection();
+    } else if (keyCode === UP_ARROW) {
+      selectedOption = (selectedOption - 1 + menuOptions.length) % menuOptions.length;
+    } else if (keyCode === DOWN_ARROW) {
+      selectedOption = (selectedOption + 1) % menuOptions.length;
+    }
+  }
 }
 
-function gameScreen() {
+function handleMenuSelection() {
+  switch (selectedOption) {
+    case 0:
+      Modeselect = 1;
+      break;
+    case 1:
+      Modeselect = 3;
+      break;
+    case 2:
+      exit();
+      break;
+  }
+}
+
+function drawControlsScreen() {
+  fill(0);
+  textAlign(CENTER);
+  textSize(32);
+  text("Controls", width / 2, height / 2 - 100);
+  textSize(24);
+  text("WASD to move", width / 2, height / 2 - 40);
+  text("Mouse to aim and shoot", width / 2, height / 2);
+  text("Press Enter to go back", width / 2, height / 2 + 40);
+  if (keyIsPressed && keyCode === ENTER) {
+    Modeselect = 0;
+  }
+}
+
+function drawGameScreen() {
   if (playerHealth <= 0) {
     Modeselect = 2;
   }
-  
+
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
   drawGrid();
 
@@ -61,7 +122,7 @@ function gameScreen() {
     zombies[i].display();
     zombies[i].update();
     if (player.shot(zombies[i])) {
-      zombies[i].health -= 10;
+      zombies[i].health -= WEAPONS[currentWeapon].damage;
       if (zombies[i].health <= 0) {
         zombies.splice(i, 1);
         score++;
@@ -76,6 +137,14 @@ function gameScreen() {
     }
   }
 
+  for (let i = healthPacks.length - 1; i >= 0; i--) {
+    healthPacks[i].display();
+    if (player.collidesWith(healthPacks[i])) {
+      playerHealth = min(playerHealth + 20, 100);
+      healthPacks.splice(i, 1);
+    }
+  }
+
   if (frame > framesTillCreate && zombies.length < 10) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
@@ -84,7 +153,7 @@ function gameScreen() {
   if (framesTillCreate > 20) {
     framesTillCreate *= 0.95;
     if (framesTillCreate < 20) {
-      framesTillCreate = 20; 
+      framesTillCreate = 20;
     }
   }
 
@@ -95,14 +164,14 @@ function gameScreen() {
   drawHealthMeter();
   drawScore();
 
-  if (mouseIsPressed && frameCount % weaponselect === 0) {
+  if (mouseIsPressed && frameCount % WEAPONS[currentWeapon].interval === 0) {
     player.shoot();
   }
 
   frame++;
 }
 
-function gameOverScreen() {
+function drawGameOverScreen() {
   fill(0);
   textAlign(CENTER);
   textSize(32);
@@ -118,7 +187,7 @@ function drawGrid() {
   for (let x = 0; x <= mapSize; x += gridSize) {
     for (let y = 0; y <= mapSize; y += gridSize) {
       fill(225);
-      rect(x+15, y+15, gridSize, gridSize);
+      rect(x + 15, y + 15, gridSize, gridSize);
     }
   }
 }
@@ -142,6 +211,7 @@ function restartGame() {
   frame = 0;
   framesTillCreate = 1000;
   zombies = [];
+  healthPacks = [];
   player.pos = createVector(mapSize / 2, mapSize / 2);
   Modeselect = 1;
 }
@@ -227,8 +297,8 @@ class Player {
     this.bullets.push(new Bullet(this.pos.x, this.pos.y, this.angle));
   }
 
-  collidesWith(zombie) {
-    return dist(this.pos.x, this.pos.y, zombie.pos.x, zombie.pos.y) < 15;
+  collidesWith(entity) {
+    return dist(this.pos.x, this.pos.y, entity.pos.x, entity.pos.y) < 15;
   }
 
   pushBack(zombie) {
@@ -242,7 +312,7 @@ class Zombie {
   constructor(speed) {
     this.speed = speed;
     this.angle = 0;
-    this.health = 100;
+    this.health = random(50, 150); // Different health for different zombie
     this.spawnOutsideCanvas();
   }
 
@@ -298,4 +368,3 @@ class Zombie {
     this.pos.add(direction.mult(7));
   }
 }
-
