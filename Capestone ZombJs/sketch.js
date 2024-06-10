@@ -101,7 +101,7 @@ function drawControlsScreen() {
   text("WASD to move", width / 2, height / 2 - 40);
   text("Mouse to aim and shoot", width / 2, height / 2);
   text("Press Enter to go back", width / 2, height / 2 + 40);
-  if (keyIsPressed && keyCode === ENTER) {
+  if (mouseIsPressed && mouselocation === settings) {
     Modeselect = 0;
   }
 }
@@ -287,7 +287,8 @@ class Zombie {
   constructor(speed) {
     this.speed = speed;
     this.angle = 0;
-    this.health = random(50, 150); // Different health for different zombie
+    this.health = random(50, 150); 
+    this.color = (random(1,30),255,random(1,3))
     this.spawnOutsideCanvas();
   }
 
@@ -320,7 +321,7 @@ class Zombie {
     translate(this.pos.x, this.pos.y);
     this.angle = atan2(player.pos.y - this.pos.y, player.pos.x - this.pos.x);
     rotate(degrees(this.angle));
-    fill(100, 255, 100);
+    fill(random(1,200),255,random(1,200));
     rect(0, 0, 20, 20);
     pop();
     fill(255, 0, 0);
