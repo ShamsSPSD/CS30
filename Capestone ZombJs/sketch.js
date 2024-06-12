@@ -3,8 +3,8 @@
 let weaponselect = 10;
 let player;
 let zombies = [];
-let healthPacks = [];
 let framesTillCreate = 1000;
+
 let frame = 0;
 let speed = 1;
 let score = 0;
@@ -12,10 +12,9 @@ let gridSize = 60;
 let mapSize = 1000;
 let playerHealth = 100;
 let Modeselect = 0;
-let shootInterval = 15;
-let reloading = false;
-const reloadTime = 1; 
+let shootInterval = 15; 
 const maxBullets = 10; 
+let relaodTime = 2000;
 
 const WEAPONS = {
   pistol: { interval: 15, damage: 10 },
@@ -67,17 +66,19 @@ function keyPressed() {
   } else if (Modeselect === 3 && keyCode === ENTER) { // Controls screen
     Modeselect = 0;
   }
-
-  if (keyCode === 82 && reloading === false) { // 82 is the keycode for 'R'
-    reload();
+  if(keyCode === 82){
+    player.reload();
   }
+
 }
 
 function mousePressed() {
   if (Modeselect === 1) { // Game screen
     player.shoot();
   }
+  
 }
+
 
 function handleMenuSelection() {
   switch (selectedOption) {
@@ -135,14 +136,6 @@ function drawGameScreen() {
     }
   }
 
-  for (let i = healthPacks.length - 1; i >= 0; i--) {
-    healthPacks[i].display();
-    if (player.collidesWith(healthPacks[i])) {
-      playerHealth = min(playerHealth + 20, 100);
-      healthPacks.splice(i, 1);
-    }
-  }
-
   if (frame > framesTillCreate && zombies.length < 10) {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
@@ -184,6 +177,7 @@ function drawGrid() {
   for (let x = 0; x <= mapSize; x += gridSize) {
     for (let y = 0; y <= mapSize; y += gridSize) {
       fill(225);
+      stroke(0);
       rect(x + 15, y + 15, gridSize, gridSize);
     }
   }
@@ -219,7 +213,7 @@ class Bullet {
     this.y = y
     ;
     this.angle = angle;
-    this.speed = 16;
+    this.speed = 7;
   }
   display() {
     push();
@@ -239,6 +233,7 @@ class Player {
     this.bullets = [];
     this.angle = 0;
     this.bulletCount = 0; // Initialize bullet count
+    this.reloadText = false;
   }
   display() {
     rectMode(CENTER);
@@ -252,6 +247,12 @@ class Player {
       bullet.display();
       bullet.update();
     }
+    if(this.reloadText){
+      stroke(255);
+      textSize(100);
+      text("reloading",500,500);
+    }
+    
   }
   update() {
     let sidewaysSpeed = 0;
@@ -286,6 +287,18 @@ class Player {
       this.bullets.push(new Bullet(this.pos.x, this.pos.y, this.angle));
       this.bulletCount++;
     }
+    
+    
+
+  }
+  reload(){
+    this.reloadText = true;
+    setTimeout(()=>{
+      this.bulletCount = 0;
+      this.reloadText = false;
+      }, relaodTime);
+
+
   }
 
   collidesWith(entity) {
@@ -358,10 +371,4 @@ class Zombie {
   }
 }
 
-function reload() {
-  reloading = true;
-  setTimeout(() => {
-    reloading = false;
-    player.bulletCount = 10; 
-  }, reloadTime * 1000); 
-}
+
