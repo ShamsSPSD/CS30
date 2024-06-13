@@ -1,6 +1,7 @@
 //Omar Shams
 //5/30/2024
-let weaponselect = 10;
+
+let weaponSelect = 10;
 let player;
 let zombies = [];
 let framesTillCreate = 1000;
@@ -11,10 +12,10 @@ let score = 0;
 let gridSize = 60;
 let mapSize = 1000;
 let playerHealth = 100;
-let Modeselect = 0;
-let shootInterval = 15; 
-const maxBullets = 10; 
-let relaodTime = 2000;
+let modeSelect = 0;
+let shootInterval = 15;
+const maxBullets = 10;
+let reloadTime = 2000;
 
 const WEAPONS = {
   pistol: { interval: 15, damage: 10 },
@@ -36,7 +37,7 @@ function setup() {
 function draw() {
   background(255);
 
-  switch (Modeselect) {
+  switch (modeSelect) {
     case 0:
       drawStartScreen();
       break;
@@ -53,7 +54,7 @@ function draw() {
 }
 
 function keyPressed() {
-  if (Modeselect === 0) { // Menu screen
+  if (modeSelect === 0) { // Menu screen
     if (keyCode === ENTER) {
       handleMenuSelection();
     } else if (keyCode === UP_ARROW) {
@@ -61,35 +62,33 @@ function keyPressed() {
     } else if (keyCode === DOWN_ARROW) {
       selectedOption = (selectedOption + 1) % menuOptions.length;
     }
-  } else if (Modeselect === 2 && keyCode === ENTER) { // Game Over screen
+  } else if (modeSelect === 2 && keyCode === ENTER) { // Game Over screen
     restartGame();
-  } else if (Modeselect === 3 && keyCode === ENTER) { // Controls screen
-    Modeselect = 0;
+  } else if (modeSelect === 3 && keyCode === ENTER) { // Controls screen
+    modeSelect = 0;
   }
-  if(keyCode === 82){
+  if (keyCode === 82) { // R key for reload
     player.reload();
   }
-
 }
 
 function mousePressed() {
-  if (Modeselect === 1) { // Game screen
+  if (modeSelect === 1) { // Game screen
     player.shoot();
   }
-  
 }
-
 
 function handleMenuSelection() {
   switch (selectedOption) {
     case 0:
-      Modeselect = 1;
+      modeSelect = 1;
+      restartGame(); // Start a new game when "Play Game" is selected
       break;
     case 1:
-      Modeselect = 3;
+      modeSelect = 3;
       break;
     case 2:
-      exit();
+      noLoop(); // Stop the draw loop to "exit" the game
       break;
   }
 }
@@ -101,11 +100,7 @@ function drawStartScreen() {
   text("Zombie Game", width / 2, height / 2 - 100);
 
   for (let i = 0; i < menuOptions.length; i++) {
-    if (i === selectedOption) {
-      fill(0, 102, 153);
-    } else {
-      fill(0);
-    }
+    fill(i === selectedOption ? color(0, 102, 153) : 0);
     textSize(24);
     text(menuOptions[i], width / 2, height / 2 - 40 + i * 40);
   }
@@ -113,7 +108,7 @@ function drawStartScreen() {
 
 function drawGameScreen() {
   if (playerHealth <= 0) {
-    Modeselect = 2;
+    modeSelect = 2;
   }
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
   drawGrid();
@@ -140,15 +135,12 @@ function drawGameScreen() {
     zombies.push(new Zombie(random(speed)));
     frame = 0;
   }
-  if (framesTillCreate > 20) {
-    framesTillCreate *= 0.95;
-    if (framesTillCreate < 20) {
-      framesTillCreate = 20;
-    }
-  }
+  framesTillCreate = max(framesTillCreate * 0.95, 20);
+
   if (frameCount % 1000 === 0) {
     speed += 0.1;
   }
+
   drawHealthMeter();
   drawScore();
 }
@@ -202,16 +194,14 @@ function restartGame() {
   frame = 0;
   framesTillCreate = 1000;
   zombies = [];
-  healthPacks = [];
   player.pos = createVector(mapSize / 2, mapSize / 2);
-  Modeselect = 1;
+  modeSelect = 1;
 }
 
 class Bullet {
   constructor(x, y, angle) {
     this.x = x;
-    this.y = y
-    ;
+    this.y = y;
     this.angle = angle;
     this.speed = 7;
   }
@@ -232,7 +222,7 @@ class Player {
     this.pos = createVector(mapSize / 2, mapSize / 2);
     this.bullets = [];
     this.angle = 0;
-    this.bulletCount = 0; // Initialize bullet count
+    this.bulletCount = 0;
     this.reloadText = false;
   }
   display() {
@@ -247,12 +237,11 @@ class Player {
       bullet.display();
       bullet.update();
     }
-    if(this.reloadText){
-      stroke(255);
-      textSize(100);
-      text("reloading",500,500);
+    if (this.reloadText) {
+      fill(0);
+      textSize(20);
+      text("reloading...", player.pos.x - width / 2 + 310, player.pos.y - height / 2 + 380);
     }
-    
   }
   update() {
     let sidewaysSpeed = 0;
@@ -287,24 +276,17 @@ class Player {
       this.bullets.push(new Bullet(this.pos.x, this.pos.y, this.angle));
       this.bulletCount++;
     }
-    
-    
-
   }
-  reload(){
+  reload() {
     this.reloadText = true;
-    setTimeout(()=>{
+    setTimeout(() => {
       this.bulletCount = 0;
       this.reloadText = false;
-      }, relaodTime);
-
-
+    }, reloadTime);
   }
-
   collidesWith(entity) {
     return dist(this.pos.x, this.pos.y, entity.pos.x, entity.pos.y) < 15;
   }
-
   pushBack(zombie) {
     let direction = p5.Vector.sub(this.pos, zombie.pos);
     direction.normalize();
@@ -370,5 +352,3 @@ class Zombie {
     this.pos.add(direction.mult(7));
   }
 }
-
-
