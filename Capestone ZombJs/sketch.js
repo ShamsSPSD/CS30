@@ -1,11 +1,9 @@
 //Omar Shams
 //5/30/2024
-
 let weaponSelect = 10;
 let player;
 let zombies = [];
 let framesTillCreate = 1000;
-
 let frame = 0;
 let speed = 1;
 let score = 0;
@@ -26,6 +24,7 @@ let currentWeapon = 'pistol';
 
 let menuOptions = ["Play Game", "Controls", "Exit"];
 let selectedOption = 0;
+let menuOptionBounds = [];
 
 function setup() {
   createCanvas(700, 700);
@@ -53,6 +52,18 @@ function draw() {
   }
 }
 
+function mousePressed() {
+  if (modeSelect === 0) { // Menu screen
+    for (let i = 0; i < menuOptionBounds.length; i++) {
+      let bounds = menuOptionBounds[i];
+      if (mouseX >= bounds.x && mouseX <= bounds.x + bounds.w && mouseY >= bounds.y && mouseY <= bounds.y + bounds.h) {
+        selectedOption = i;
+        handleMenuSelection();
+      }
+    }
+  }
+}
+
 function keyPressed() {
   if (modeSelect === 0) { // Menu screen
     if (keyCode === ENTER) {
@@ -70,12 +81,15 @@ function keyPressed() {
   if (keyCode === 82) { // R key for reload
     player.reload();
   }
+  if (keyCode >= 49 && keyCode <= 51) { // Number keys 1, 2, 3 for weapon switch
+    switchWeapon(keyCode - 49);
+  }
 }
 
-function mousePressed() {
-  if (modeSelect === 1) { // Game screen
-    player.shoot();
-  }
+function switchWeapon(index) {
+  const weaponKeys = Object.keys(WEAPONS);
+  currentWeapon = weaponKeys[index];
+  shootInterval = WEAPONS[currentWeapon].interval;
 }
 
 function handleMenuSelection() {
@@ -88,8 +102,7 @@ function handleMenuSelection() {
       modeSelect = 3;
       break;
     case 2:
-      noLoop(); // Stop the draw loop to "exit" the game
-      break;
+
   }
 }
 
@@ -99,10 +112,20 @@ function drawStartScreen() {
   textSize(32);
   text("Zombie Game", width / 2, height / 2 - 100);
 
+  menuOptionBounds = [];
   for (let i = 0; i < menuOptions.length; i++) {
     fill(i === selectedOption ? color(0, 102, 153) : 0);
     textSize(24);
     text(menuOptions[i], width / 2, height / 2 - 40 + i * 40);
+
+    // Store bounds for each menu option
+    let bounds = {
+      x: width / 2 - textWidth(menuOptions[i]) / 2,
+      y: height / 2 - 40 + i * 40 - 24, // Adjust y to top of the text
+      w: textWidth(menuOptions[i]),
+      h: 24 // Text size
+    };
+    menuOptionBounds.push(bounds);
   }
 }
 
@@ -114,7 +137,9 @@ function drawGameScreen() {
   drawGrid();
   player.display();
   player.update();
-
+  if (modeSelect === 1 && mouseIsPressed && frameCount % shootInterval === 0) { // Game screen
+    player.shoot();
+  }
   for (let i = zombies.length - 1; i >= 0; i--) {
     zombies[i].display();
     zombies[i].update();
@@ -143,6 +168,7 @@ function drawGameScreen() {
 
   drawHealthMeter();
   drawScore();
+  frame++;
 }
 
 function drawGameOverScreen() {
@@ -162,7 +188,9 @@ function drawControlsScreen() {
   textSize(24);
   text("WASD to move", width / 2, height / 2 - 40);
   text("Mouse to aim and shoot", width / 2, height / 2);
-  text("Press Enter to go back", width / 2, height / 2 + 40);
+  text("R to reload", width / 2, height / 2 + 40);
+  text("1, 2, 3 to switch weapons", width / 2, height / 2 + 80);
+  text("Press Enter to go back", width / 2, height / 2 + 120);
 }
 
 function drawGrid() {
@@ -299,30 +327,18 @@ class Zombie {
     this.speed = speed;
     this.angle = 0;
     this.health = random(50, 150);
-    this.spawnOutsideCanvas();
+    this.spawnAtSetLocation();
   }
 
-  spawnOutsideCanvas() {
-    let edge = floor(random(4));
-    switch (edge) {
-      case 0:
-        this.x = random(mapSize);
-        this.y = 0;
-        break;
-      case 1:
-        this.x = mapSize;
-        this.y = random(mapSize);
-        break;
-      case 2:
-        this.x = random(mapSize);
-        this.y = mapSize;
-        break;
-      case 3:
-        this.x = 0;
-        this.y = random(mapSize);
-        break;
-    }
-    this.pos = createVector(this.x, this.y);
+  spawnAtSetLocation() {
+    let spawnLocations = [
+      createVector(0, 0),
+      createVector(mapSize, 0),
+      createVector(0, mapSize),
+      createVector(mapSize, mapSize)
+    ];
+    let location = random(spawnLocations);
+    this.pos = location.copy();
   }
 
   display() {
