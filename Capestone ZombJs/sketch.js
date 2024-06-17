@@ -1,5 +1,7 @@
 //Omar Shams
 //5/30/2024
+
+let backgroundImage; // Variable to store the background image
 let weaponSelect = 10;
 let player;
 let zombies = [];
@@ -25,6 +27,11 @@ let currentWeapon = 'pistol';
 let menuOptions = ["Play Game", "Controls", "Exit"];
 let selectedOption = 0;
 let menuOptionBounds = [];
+
+function preload() {
+  // Load the background image
+  backgroundImage = loadImage('assets/17-sandy-v0-s651p8lxpy5d1 - Copy.webp');
+}
 
 function setup() {
   createCanvas(700, 700);
@@ -102,7 +109,9 @@ function handleMenuSelection() {
       modeSelect = 3;
       break;
     case 2:
-
+      // Exit the game
+      noLoop();
+      break;
   }
 }
 
@@ -134,7 +143,9 @@ function drawGameScreen() {
     modeSelect = 2;
   }
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
-  drawGrid();
+
+  image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 60, 2000, 2000);
+
   player.display();
   player.update();
   if (modeSelect === 1 && mouseIsPressed && frameCount % shootInterval === 0) { // Game screen
@@ -193,15 +204,6 @@ function drawControlsScreen() {
   text("Press Enter to go back", width / 2, height / 2 + 120);
 }
 
-function drawGrid() {
-  for (let x = 0; x <= mapSize; x += gridSize) {
-    for (let y = 0; y <= mapSize; y += gridSize) {
-      fill(225);
-      stroke(0);
-      rect(x + 15, y + 15, gridSize, gridSize);
-    }
-  }
-}
 
 function drawHealthMeter() {
   fill(255, 0, 0);
@@ -223,6 +225,8 @@ function restartGame() {
   framesTillCreate = 1000;
   zombies = [];
   player.pos = createVector(mapSize / 2, mapSize / 2);
+  player.bullets = [];
+  player.bulletCount = 0;
   modeSelect = 1;
 }
 
@@ -286,7 +290,11 @@ class Player {
     if (keyIsDown(83)) { // S key
       forwardSpeed = 5;
     }
-    this.pos.add(sidewaysSpeed, forwardSpeed);
+    let movement = createVector(sidewaysSpeed, forwardSpeed);
+    if (movement.mag() > 0) {
+      movement.normalize().mult(5);
+      this.pos.add(movement);
+    }
     this.pos.x = constrain(this.pos.x, 0, mapSize);
     this.pos.y = constrain(this.pos.y, 0, mapSize);
   }
@@ -300,17 +308,19 @@ class Player {
     return false;
   }
   shoot() {
-    if (this.bulletCount < maxBullets) {
+    if (this.bulletCount < maxBullets && !this.reloadText) {
       this.bullets.push(new Bullet(this.pos.x, this.pos.y, this.angle));
       this.bulletCount++;
     }
   }
   reload() {
-    this.reloadText = true;
-    setTimeout(() => {
-      this.bulletCount = 0;
-      this.reloadText = false;
-    }, reloadTime);
+    if (!this.reloadText) {
+      this.reloadText = true;
+      setTimeout(() => {
+        this.bulletCount = 0;
+        this.reloadText = false;
+      }, reloadTime);
+    }
   }
   collidesWith(entity) {
     return dist(this.pos.x, this.pos.y, entity.pos.x, entity.pos.y) < 15;
