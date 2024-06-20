@@ -1,10 +1,11 @@
 //Omar Shams
 //5/30/2024
 
-let backgroundImage; // Variable to store the background image
-let weaponSelect = 10;
+
+let backgroundImage;
 let player;
 let zombies = [];
+let barricades = [];
 let framesTillCreate = 1000;
 let frame = 0;
 let speed = 1;
@@ -18,7 +19,7 @@ const maxBullets = 10;
 let reloadTime = 2000;
 
 const WEAPONS = {
-  pistol: { interval: 15, damage: 10 },
+  pistol: { interval: 15, damage: 100 },
   rifle: { interval: 10, damage: 20 },
   shotgun: { interval: 30, damage: 50 },
 };
@@ -29,8 +30,8 @@ let selectedOption = 0;
 let menuOptionBounds = [];
 
 function preload() {
-  // Load the background image
-  backgroundImage = loadImage('assets/17-sandy-v0-s651p8lxpy5d1 - Copy.webp');
+  backgroundImage = loadImage('assets/c9445ae885e4cf44a256baf7f6a52f51.jpg');
+  // Load other assets like sound effects and music here
 }
 
 function setup() {
@@ -38,6 +39,8 @@ function setup() {
   imageMode(CENTER);
   player = new Player();
   zombies.push(new Zombie(3));
+  frameRate(60); // Set a consistent frame rate
+  placeInitialBarricades(); // Place barricades around zombie spawn locations
 }
 
 function draw() {
@@ -68,7 +71,7 @@ function mousePressed() {
         handleMenuSelection();
       }
     }
-  }
+  } 
 }
 
 function keyPressed() {
@@ -90,6 +93,9 @@ function keyPressed() {
   }
   if (keyCode >= 49 && keyCode <= 51) { // Number keys 1, 2, 3 for weapon switch
     switchWeapon(keyCode - 49);
+  }
+  if (key === 'b' || key === 'B') { // B key to place barricade
+    player.placeBarricade();
   }
 }
 
@@ -143,8 +149,7 @@ function drawGameScreen() {
     modeSelect = 2;
   }
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
-
-  image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 60, 2000, 2000);
+  image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 650, 2000, 2000);
 
   player.display();
   player.update();
@@ -158,6 +163,15 @@ function drawGameScreen() {
       zombies[i].health -= WEAPONS[currentWeapon].damage;
       if (zombies[i].health <= 0) {
         zombies.splice(i, 1);
+        score++;
+        score++;
+        score++;
+        score++;
+        score++;
+        score++;
+        score++;
+        score++;
+        score++;
         score++;
       }
     } else if (player.collidesWith(zombies[i])) {
@@ -177,8 +191,21 @@ function drawGameScreen() {
     speed += 0.1;
   }
 
-  drawHealthMeter();
-  drawScore();
+  for (let i = barricades.length - 1; i >= 0; i--) {
+    barricades[i].display();
+    for (let j = zombies.length - 1; j >= 0; j--) {
+      if (barricades[i].collidesWith(zombies[j])) {
+        barricades[i].health -= 5;
+        zombies[j].pushBack(barricades[i]);
+        if (barricades[i].health <= 0) {
+          barricades.splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+
+  drawHUD();
   frame++;
 }
 
@@ -201,9 +228,15 @@ function drawControlsScreen() {
   text("Mouse to aim and shoot", width / 2, height / 2);
   text("R to reload", width / 2, height / 2 + 40);
   text("1, 2, 3 to switch weapons", width / 2, height / 2 + 80);
-  text("Press Enter to go back", width / 2, height / 2 + 120);
+  text("Click to place barricades", width / 2, height / 2 + 120);
+  text("Press Enter to go back", width / 2, height / 2 + 160);
 }
 
+function drawHUD() {
+  drawHealthMeter();
+  drawScore();
+  drawAmmoCount();
+}
 
 function drawHealthMeter() {
   fill(255, 0, 0);
@@ -217,6 +250,13 @@ function drawScore() {
   text("Score: " + score, player.pos.x - width / 2 + 10, player.pos.y - height / 2 + 30);
 }
 
+function drawAmmoCount() {
+  fill(0);
+  textAlign(LEFT);
+  textSize(16);
+  text(`Ammo: ${player.bulletCount}/${maxBullets}`, player.pos.x - width / 2 + 10, player.pos.y - height / 2 + 50);
+}
+
 function restartGame() {
   playerHealth = 100;
   score = 0;
@@ -224,10 +264,21 @@ function restartGame() {
   frame = 0;
   framesTillCreate = 1000;
   zombies = [];
-  player.pos = createVector(mapSize / 2, mapSize / 2);
-  player.bullets = [];
-  player.bulletCount = 0;
-  modeSelect = 1;
+  barricades = [];
+  player.pos = createVector(width / 2, height / 2);
+  placeInitialBarricades();
+}
+
+function placeInitialBarricades() {
+  let spawnLocations = [
+    createVector(0, 0),
+    createVector(mapSize - gridSize, 0),
+    createVector(0, mapSize - gridSize),
+    createVector(mapSize - gridSize, mapSize - gridSize)
+  ];
+  for (let location of spawnLocations) {
+    barricades.push(new Barricade(location.x, location.y));
+  }
 }
 
 class Bullet {
@@ -235,25 +286,31 @@ class Bullet {
     this.x = x;
     this.y = y;
     this.angle = angle;
-    this.speed = 7;
+    this.speed = 10;
+    this.distance = 0;
   }
   display() {
     push();
-    fill(0);
-    circle(this.x, this.y, 5);
+    translate(this.x, this.y);
+    rotate(this.angle);
+    rect(0, 0, 10, 10);
     pop();
   }
   update() {
-    this.x += this.speed * cos(this.angle);
-    this.y += this.speed * sin(this.angle);
+    this.x += cos(this.angle) * this.speed;
+    this.y += sin(this.angle) * this.speed;
+    this.distance += this.speed;
+    if (this.distance > 500) {
+      player.bullets.splice(player.bullets.indexOf(this), 1);
+    }
   }
 }
 
 class Player {
   constructor() {
-    this.pos = createVector(mapSize / 2, mapSize / 2);
-    this.bullets = [];
+    this.pos = createVector(width / 2, height / 2);
     this.angle = 0;
+    this.bullets = [];
     this.bulletCount = 0;
     this.reloadText = false;
   }
@@ -272,40 +329,21 @@ class Player {
     if (this.reloadText) {
       fill(0);
       textSize(20);
-      text("reloading...", player.pos.x - width / 2 + 310, player.pos.y - height / 2 + 380);
+      text("Reloading...", player.pos.x - width / 2 + 310, player.pos.y - height / 2 + 380);
     }
   }
   update() {
-    let sidewaysSpeed = 0;
-    let forwardSpeed = 0;
-    if (keyIsDown(65)) { // A key
-      sidewaysSpeed = -5;
-    }
-    if (keyIsDown(68)) { // D key
-      sidewaysSpeed = 5;
-    }
-    if (keyIsDown(87)) { // W key
-      forwardSpeed = -5;
-    }
-    if (keyIsDown(83)) { // S key
-      forwardSpeed = 5;
-    }
-    let movement = createVector(sidewaysSpeed, forwardSpeed);
+    let movement = createVector(0, 0);
+    if (keyIsDown(65)) movement.x = -5; // A key
+    if (keyIsDown(68)) movement.x = 5;  // D key
+    if (keyIsDown(87)) movement.y = -5; // W key
+    if (keyIsDown(83)) movement.y = 5;  // S key
     if (movement.mag() > 0) {
       movement.normalize().mult(5);
       this.pos.add(movement);
     }
     this.pos.x = constrain(this.pos.x, 0, mapSize);
     this.pos.y = constrain(this.pos.y, 0, mapSize);
-  }
-  shot(zombie) {
-    for (let i = this.bullets.length - 1; i >= 0; i--) {
-      if (dist(this.bullets[i].x, this.bullets[i].y, zombie.pos.x, zombie.pos.y) < 10) {
-        this.bullets.splice(i, 1);
-        return true;
-      }
-    }
-    return false;
   }
   shoot() {
     if (this.bulletCount < maxBullets && !this.reloadText) {
@@ -322,13 +360,38 @@ class Player {
       }, reloadTime);
     }
   }
-  collidesWith(entity) {
-    return dist(this.pos.x, this.pos.y, entity.pos.x, entity.pos.y) < 15;
+  shot(zombie) {
+    for (let bullet of this.bullets) {
+      if (dist(bullet.x, bullet.y, zombie.pos.x, zombie.pos.y) < 10) {
+        this.bullets.splice(this.bullets.indexOf(bullet), 1);
+        return true;
+      }
+    }
+    return false;
+  }
+  collidesWith(zombie) {
+    return dist(this.pos.x, this.pos.y, zombie.pos.x, zombie.pos.y) < 20;
   }
   pushBack(zombie) {
-    let direction = p5.Vector.sub(this.pos, zombie.pos);
-    direction.normalize();
-    this.pos.add(direction.mult(7));
+    let push = p5.Vector.sub(this.pos, zombie.pos);
+    push.setMag(10);
+    this.pos.add(push);
+  }
+  placeBarricade() {
+    let x = this.pos.x + cos(this.angle) * 60; // Place barricade in front of the player
+    let y = this.pos.y + sin(this.angle) * 60;
+    let newBarricade = new Barricade(x, y);
+    
+    // Ensure new barricade does not overlap with existing ones
+    for (let barricade of barricades) {
+      if (dist(barricade.pos.x, barricade.pos.y, newBarricade.pos.x, newBarricade.pos.y) < newBarricade.size) {
+        return; // Do not place the barricade if it overlaps
+      }
+    }
+    
+    if (barricades.length < 20) { // Limit the number of barricades
+      barricades.push(newBarricade);
+    }
   }
 }
 
@@ -339,18 +402,16 @@ class Zombie {
     this.health = random(50, 150);
     this.spawnAtSetLocation();
   }
-
   spawnAtSetLocation() {
     let spawnLocations = [
       createVector(0, 0),
-      createVector(mapSize, 0),
-      createVector(0, mapSize),
-      createVector(mapSize, mapSize)
+      createVector(mapSize - gridSize, 0),
+      createVector(0, mapSize - gridSize),
+      createVector(mapSize - gridSize, mapSize - gridSize)
     ];
     let location = random(spawnLocations);
     this.pos = location.copy();
   }
-
   display() {
     rectMode(CENTER);
     push();
@@ -365,16 +426,39 @@ class Zombie {
     fill(0, 255, 0);
     rect(this.pos.x - 10, this.pos.y - 20, map(this.health, 0, 150, 0, 20), 3);
   }
-
   update() {
     let difference = p5.Vector.sub(player.pos, this.pos);
     difference.limit(this.speed);
     this.pos.add(difference);
   }
-
   pushBack(player) {
-    let direction = p5.Vector.sub(this.pos, player.pos);
-    direction.normalize();
-    this.pos.add(direction.mult(7));
+    let push = p5.Vector.sub(this.pos, player.pos);
+    push.setMag(10);
+    this.pos.add(push);
+  }
+}
+
+class Barricade {
+  constructor(x, y) {
+    this.pos = createVector(x, y);
+    this.size = 60; // Increase size to fully block zombies
+    this.health = 100;
+  }
+  display() {
+    fill(150, 75, 0);
+    rectMode(CENTER);
+    rect(this.pos.x, this.pos.y, this.size, this.size);
+    fill(255, 0, 0);
+    rect(this.pos.x - this.size / 2, this.pos.y - this.size - 10, this.size, 5);
+    fill(0, 255, 0);
+    rect(this.pos.x - this.size / 2, this.pos.y - this.size - 10, map(this.health, 0, 100, 0, this.size), 5);
+  }
+  collidesWith(zombie) {
+    return dist(this.pos.x, this.pos.y, zombie.pos.x, zombie.pos.y) < this.size / 2;
+  }
+  pushBack(zombie) {
+    let push = p5.Vector.sub(this.pos, zombie.pos);
+    push.setMag(10);
+    this.pos.add(push);
   }
 }
