@@ -1,92 +1,96 @@
+// Final Coding Challenge Review
 
 let gorillaIdle = [];
 let goriallaSwipe = [];
 let spiralImages = [];
-let spirals = [];
 
-function preload(){ 
+// Global Variables...
+let spirals = []; //to hold spiral objects
 
-  for (let i = 0; i <= 15; i++){
-    if(i < 10){
-      spiralImages.push(loadImage("assets/Circle/Circle Animation0"+i+".png"));
+function preload() { //to ensure loading is done
+  //Spirals 00-09   10-15
+  for (let i = 0; i <= 15; i++) {
+    if (i < 10) {
+      spiralImages.push(loadImage("assets/Circle/Circle Animation0" + i + ".png"));
     }
-    else{
-      spiralImages.push(loadImage("assets/Circle/Circle Animation"+i+".png"));
+    else {
+      spiralImages.push(loadImage("assets/Circle/Circle Animation" + i + ".png"));
     }
   }
 
-
-  for(let i = 1; i <= 6; i++){ 
+  //Gorialla IDLE images
+  for (let i = 1; i <= 6; i++) { //1, 2, 3, 4, 5, 6
     gorillaIdle.push(loadImage("assets/Gorilla/idle" + i + ".png"));
   }
 
-
-  for(let i = 1; i <= 6; i++){ 
+  //Gorialla SWIPE images
+  for (let i = 1; i <= 6; i++) { //1, 2, 3, 4, 5, 6
     goriallaSwipe.push(loadImage("assets/Gorilla/swipe" + i + ".png"));
   }
 }
 
 function setup() {
-  fill(255);
   createCanvas(windowWidth, windowHeight);
-  
+
 }
 
-let currentstate = 0;
-let idleindex = 0; let swipeindex = 0;
+//more globals
+let currentState = 0;
+let idleIndex = 0;
+let swipeIndex = 0;
 
-function keyPressed(){
-  if(currentstate === 0) currentstate = 1;
-  else currentstate = 0
+function keyPressed() {
+  if (currentState === 0) currentState = 1
+  else currentState = 0;
 }
+
 
 function draw() {
-  
-  if (currentstate === 0){
-      
-    image(gorillaIdle[idleindex],width/2,height/2);
-    
-    if(frameCount % 8 === 0){
-      idleindex++;
-      if(idleindex > 5) idleindex = 0;
+  background(0);
+  if (currentState === 0) {
+    image(gorillaIdle[idleIndex], width / 2, height / 2);
+    if (frameCount % 40 === 0) {
+      idleIndex++;
+      if (idleIndex > 5) idleIndex = 0;
+    }
+
+  } 
+  if (currentState === 1) {
+    image(goriallaSwipe[swipeIndex], width / 2, height / 2);
+    if (frameCount % 8 === 0) {
+      swipeIndex++;
+      if (swipeIndex > 5) swipeIndex = 0;
     }
   }
 
-
-
- for(let i = 0; i < spirals.length;i++){
-  let s = spirals[i];
-  s.display();
-  if(s.active === false){
-    spirals.splice(1,3);
+  //draw Spirals
+  for (let i = 0; i < spirals.length; i++) {
+    let s = spirals[i];
+    s.display();
   }
- }
 }
 
-function mousePressed(){
-  spirals.push(new Spiral(mouseX,mouseY));
+function mousePressed() {
+  spirals.push(new Spiral(mouseX, mouseY));
 }
 
-
-
-class Spiral {
-  constructor(x,y,){
-    this.pos = createVector(x,y);
-    this.currentframe = 0;
-    this.active = true;
-
+class Spiral { //frames 0 - 15    ..16
+  constructor(x, y) { //happens once, for each object created
+    this.pos = createVector(x, y);
+    this.currentFrame = 0;
+    this.active = true;  //for deletion purposes
   }
-  display(){
-    if (this.currentframe > 15){
+
+  //class methods
+  display() {
+    if (this.currentFrame > 15) {
       this.active = false;
-
     }
-    else{
-      image(spiralImages[this.currentframe],this.pos.x,this.pos.y);
-      if(frameCount % 3 === 0){
-        this.currentframe++;
-      }
+    else {
+      image(spiralImages[this.currentFrame], this.pos.x, this.pos.y);
+     
+        this.currentFrame++;
+      
     }
   }
-
 }
