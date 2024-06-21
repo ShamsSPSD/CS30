@@ -21,7 +21,7 @@ const WEAPONS = {
   rifle: { interval: 10, damage: 20 },
   minigun: { interval: 1, damage: 5 },
   sniper: { interval: 60, damage: 1000 },
-  shotgun: { interval: 30, damage: 50 },
+
 };
 let currentWeapon = 'pistol';
 
@@ -31,7 +31,6 @@ let menuOptionBounds = [];
 
 function preload() {
   backgroundImage = loadImage('assets/c9445ae885e4cf44a256baf7f6a52f51.jpg');
-  // Load other assets like sound effects and music here
 }
 
 function setup() {
@@ -39,7 +38,7 @@ function setup() {
   imageMode(CENTER);
   player = new Player();
   zombies.push(new Zombie(3));
-  frameRate(60); // Set a consistent frame rate
+  frameRate(60); 
   placeInitialBarricades(); // Place barricades around zombie spawn locations
 }
 
