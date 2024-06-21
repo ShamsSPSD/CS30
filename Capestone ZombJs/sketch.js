@@ -1,7 +1,5 @@
 //Omar Shams
 //5/30/2024
-
-
 let backgroundImage;
 let player;
 let zombies = [];
@@ -21,6 +19,8 @@ let reloadTime = 2000;
 const WEAPONS = {
   pistol: { interval: 15, damage: 100 },
   rifle: { interval: 10, damage: 20 },
+  minigun: { interval: 1, damage: 5 },
+  sniper: { interval: 60, damage: 1000 },
   shotgun: { interval: 30, damage: 50 },
 };
 let currentWeapon = 'pistol';
@@ -62,6 +62,7 @@ function draw() {
   }
 }
 
+
 function mousePressed() {
   if (modeSelect === 0) { // Menu screen
     for (let i = 0; i < menuOptionBounds.length; i++) {
@@ -75,16 +76,8 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (modeSelect === 0) { // Menu screen
-    if (keyCode === ENTER) {
-      handleMenuSelection();
-    } else if (keyCode === UP_ARROW) {
-      selectedOption = (selectedOption - 1 + menuOptions.length) % menuOptions.length;
-    } else if (keyCode === DOWN_ARROW) {
-      selectedOption = (selectedOption + 1) % menuOptions.length;
-    }
-  } else if (modeSelect === 2 && keyCode === ENTER) { // Game Over screen
-    restartGame();
+ if (modeSelect === 2 && keyCode === ENTER) { // Game Over screen
+    drawStartScreen();
   } else if (modeSelect === 3 && keyCode === ENTER) { // Controls screen
     modeSelect = 0;
   }
@@ -94,7 +87,7 @@ function keyPressed() {
   if (keyCode >= 49 && keyCode <= 51) { // Number keys 1, 2, 3 for weapon switch
     switchWeapon(keyCode - 49);
   }
-  if (key === 'b' || key === 'B') { // B key to place barricade
+  if (key === 'b' || key === 'B') { 
     player.placeBarricade();
   }
 }
@@ -104,6 +97,7 @@ function switchWeapon(index) {
   currentWeapon = weaponKeys[index];
   shootInterval = WEAPONS[currentWeapon].interval;
 }
+
 
 function handleMenuSelection() {
   switch (selectedOption) {
@@ -115,8 +109,7 @@ function handleMenuSelection() {
       modeSelect = 3;
       break;
     case 2:
-      // Exit the game
-      noLoop();
+      modeSelect = 2;
       break;
   }
 }
@@ -216,6 +209,9 @@ function drawGameOverScreen() {
   text("Game Over", width / 2, height / 2 - 40);
   textSize(24);
   text("Press Enter to Restart", width / 2, height / 2);
+  if (keyPressed && keyCode === ENTER){
+    modeSelect === 0
+  }
 }
 
 function drawControlsScreen() {
@@ -228,7 +224,7 @@ function drawControlsScreen() {
   text("Mouse to aim and shoot", width / 2, height / 2);
   text("R to reload", width / 2, height / 2 + 40);
   text("1, 2, 3 to switch weapons", width / 2, height / 2 + 80);
-  text("Click to place barricades", width / 2, height / 2 + 120);
+  text("Click B to place barricades", width / 2, height / 2 + 120);
   text("Press Enter to go back", width / 2, height / 2 + 160);
 }
 
@@ -293,7 +289,7 @@ class Bullet {
     push();
     translate(this.x, this.y);
     rotate(this.angle);
-    rect(0, 0, 10, 10);
+    circle(10, 0, 5);
     pop();
   }
   update() {
