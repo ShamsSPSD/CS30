@@ -144,7 +144,7 @@ function drawGameScreen() {
   }
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
 
-  image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 60, 2000, 2000);
+  image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 650, 2000, 2000);
 
   player.display();
   player.update();
