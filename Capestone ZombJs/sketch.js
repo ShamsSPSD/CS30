@@ -1,5 +1,9 @@
 //Omar Shams
 //5/30/2024
+//simple zombie survival game with guns and barrier techniques
+//
+
+//deifining variable
 let backgroundImage;
 let player;
 let zombies = [];
@@ -16,6 +20,8 @@ let shootInterval = 15;
 const maxBullets = 10;
 let reloadTime = 2000;
 
+
+//a list to help scroll through guns (can add however many you need)
 const WEAPONS = {
   pistol: { interval: 15, damage: 100 },
   rifle: { interval: 10, damage: 20 },
@@ -25,14 +31,18 @@ const WEAPONS = {
 };
 let currentWeapon = 'pistol';
 
+//more variables
 let menuOptions = ["Play Game", "Controls", "Exit"];
 let selectedOption = 0;
 let menuOptionBounds = [];
 
+//background
 function preload() {
   backgroundImage = loadImage('assets/c9445ae885e4cf44a256baf7f6a52f51.jpg');
 }
 
+
+//creates the player and zombies and defines where barriers are initialy placed
 function setup() {
   createCanvas(700, 700);
   imageMode(CENTER);
@@ -42,6 +52,7 @@ function setup() {
   placeInitialBarricades(); // Place barricades around zombie spawn locations
 }
 
+//different modes
 function draw() {
   background(255);
 
@@ -61,7 +72,7 @@ function draw() {
   }
 }
 
-
+//checks for when the mouse is pressed in a given mode and reacts accordingly this appears alot
 function mousePressed() {
   if (modeSelect === 0) { // Menu screen
     for (let i = 0; i < menuOptionBounds.length; i++) {
@@ -74,6 +85,7 @@ function mousePressed() {
   } 
 }
 
+//handles barriers reloading and different options for changing menus
 function keyPressed() {
  if (modeSelect === 2 && keyCode === ENTER) { // Game Over screen
     drawStartScreen();
@@ -91,6 +103,7 @@ function keyPressed() {
   }
 }
 
+//modular weapon switching
 function switchWeapon(index) {
   const weaponKeys = Object.keys(WEAPONS);
   currentWeapon = weaponKeys[index];
@@ -113,6 +126,7 @@ function handleMenuSelection() {
   }
 }
 
+//base screen 
 function drawStartScreen() {
   fill(0);
   textAlign(CENTER);
@@ -136,15 +150,12 @@ function drawStartScreen() {
   }
 }
 
+//actual game also defines everthing that can occur here
 function drawGameScreen() {
   if (playerHealth <= 0) {
-    modeSelect = 2;
+    modeSelect = 2;//end game when player dies
   }
   translate(width / 2 - player.pos.x, height / 2 - player.pos.y);
-<<<<<<< HEAD
-
-=======
->>>>>>> 24b98703400e193c62bec6324949fa91dcea6a01
   image(backgroundImage, width / 2 - player.pos.x + 650, height / 2 - player.pos.y + 650, 2000, 2000);
 
   player.display();
@@ -179,7 +190,7 @@ function drawGameScreen() {
 
   if (frame > framesTillCreate && zombies.length < 10) {
     zombies.push(new Zombie(random(speed)));
-    frame = 0;
+    frame = 0;//makes new zombies
   }
   framesTillCreate = max(framesTillCreate * 0.95, 20);
 
@@ -196,7 +207,7 @@ function drawGameScreen() {
         if (barricades[i].health <= 0) {
           barricades.splice(i, 1);
           break;
-        }
+        }//allows for barriar placement
       }
     }
   }
@@ -204,7 +215,7 @@ function drawGameScreen() {
   drawHUD();
   frame++;
 }
-
+//when player dies
 function drawGameOverScreen() {
   fill(0);
   textAlign(CENTER);
@@ -216,7 +227,7 @@ function drawGameOverScreen() {
     modeSelect === 0
   }
 }
-
+//to help understand what to do
 function drawControlsScreen() {
   fill(0);
   textAlign(CENTER);
@@ -231,17 +242,19 @@ function drawControlsScreen() {
   text("Press Enter to go back", width / 2, height / 2 + 160);
 }
 
+//all info the player might need
 function drawHUD() {
   drawHealthMeter();
   drawScore();
   drawAmmoCount();
 }
-
+//health
 function drawHealthMeter() {
   fill(255, 0, 0);
   rect(player.pos.x - width / 2 + 350, player.pos.y - height / 2 + 320, playerHealth / 2, 10);
 }
 
+//zombies killed
 function drawScore() {
   fill(0);
   textAlign(LEFT);
@@ -249,6 +262,7 @@ function drawScore() {
   text("Score: " + score, player.pos.x - width / 2 + 10, player.pos.y - height / 2 + 30);
 }
 
+//ammo used 
 function drawAmmoCount() {
   fill(0);
   textAlign(LEFT);
@@ -256,6 +270,7 @@ function drawAmmoCount() {
   text(`Ammo: ${player.bulletCount}/${maxBullets}`, player.pos.x - width / 2 + 10, player.pos.y - height / 2 + 50);
 }
 
+//when the player dies this runs
 function restartGame() {
   playerHealth = 100;
   score = 0;
@@ -280,6 +295,7 @@ function placeInitialBarricades() {
   }
 }
 
+//class for the bullet (or gun if you will)
 class Bullet {
   constructor(x, y, angle) {
     this.x = x;
@@ -305,6 +321,7 @@ class Bullet {
   }
 }
 
+//player class
 class Player {
   constructor() {
     this.pos = createVector(width / 2, height / 2);
@@ -317,7 +334,7 @@ class Player {
     rectMode(CENTER);
     push();
     translate(this.pos.x, this.pos.y);
-    this.angle = atan2(mouseY - height / 2, mouseX - width / 2);
+    this.angle = atan2(mouseY - height / 2, mouseX - width / 2);//the player follows the mouse
     rotate(this.angle);
     rect(0, 0, 10, 10);
     pop();
@@ -327,11 +344,11 @@ class Player {
     }
     if (this.reloadText) {
       fill(0);
-      textSize(20);
+      textSize(20);//when reloading show that it is
       text("Reloading...", player.pos.x - width / 2 + 310, player.pos.y - height / 2 + 380);
     }
   }
-  update() {
+  update() {//movement
     let movement = createVector(0, 0);
     if (keyIsDown(65)) movement.x = -5; // A key
     if (keyIsDown(68)) movement.x = 5;  // D key
@@ -359,7 +376,7 @@ class Player {
       }, reloadTime);
     }
   }
-  shot(zombie) {
+  shot(zombie) {//when a zombies is shot
     for (let bullet of this.bullets) {
       if (dist(bullet.x, bullet.y, zombie.pos.x, zombie.pos.y) < 10) {
         this.bullets.splice(this.bullets.indexOf(bullet), 1);
@@ -368,10 +385,10 @@ class Player {
     }
     return false;
   }
-  collidesWith(zombie) {
+  collidesWith(zombie) {//when a zombie hurts the player
     return dist(this.pos.x, this.pos.y, zombie.pos.x, zombie.pos.y) < 20;
   }
-  pushBack(zombie) {
+  pushBack(zombie) {//ensures the zombies cant just kill the player instantly
     let push = p5.Vector.sub(this.pos, zombie.pos);
     push.setMag(10);
     this.pos.add(push);
@@ -394,6 +411,7 @@ class Player {
   }
 }
 
+//zombie class
 class Zombie {
   constructor(speed) {
     this.speed = speed;
@@ -436,9 +454,8 @@ class Zombie {
     this.pos.add(push);
   }
 }
-<<<<<<< HEAD
-=======
 
+//barricade class
 class Barricade {
   constructor(x, y) {
     this.pos = createVector(x, y);
@@ -463,4 +480,3 @@ class Barricade {
     this.pos.add(push);
   }
 }
->>>>>>> 24b98703400e193c62bec6324949fa91dcea6a01
